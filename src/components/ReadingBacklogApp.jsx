@@ -212,14 +212,17 @@ const getPriorityColor = (priority) => {
 
   return (
     <div className="min-h-screen bg-[#F6F5F2] bg-subtle-pattern bg-fixed px-8 py-6" style={{ backgroundColor: '#F6F5F2' }}>
+    
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Reading Backlog</h1>
+          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+          <img src="/book.png" alt="Book Icon" className="w-8 h-8" />
+            Reading Backlog</h1>
           <div className="flex gap-4">
             <Button 
               onClick={() => setIsAddDialogOpen(true)}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 bg-black text-white hover:bg-gray-800"
             >
               <Plus className="w-4 h-4" />
               Add Book
@@ -249,6 +252,7 @@ const getPriorityColor = (priority) => {
                 className="hidden"
               />
             </div>
+  
             <Button
               variant="destructive"
               onClick={handleClear}
@@ -279,7 +283,7 @@ const getPriorityColor = (priority) => {
                   setSelectedBook(book);
                   setIsDetailSheetOpen(true);
                 }}
-                className="bg-white rounded-lg shadow-md p-3 cursor-pointer transition-transform hover:scale-105"
+                className="bg-white rounded-lg shadow-md p-3 cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-[1.02] hover:bg-gray-50"
               >
                 <div className="flex justify-between items-start gap-4">
                   <div className="flex-1">
