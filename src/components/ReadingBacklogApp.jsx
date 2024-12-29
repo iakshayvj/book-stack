@@ -279,14 +279,14 @@ const getPriorityColor = (priority) => {
                   setSelectedBook(book);
                   setIsDetailSheetOpen(true);
                 }}
-                className="bg-white rounded-lg shadow-md p-4 cursor-pointer transition-transform hover:scale-105"
+                className="bg-white rounded-lg shadow-md p-3 cursor-pointer transition-transform hover:scale-105"
               >
                 <div className="flex justify-between items-start gap-4">
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-lg mb-1 line-clamp-2">{book.title}</h3>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-lg mb-1 break-words">{book.title}</h3>
                     <p className="text-gray-600 text-sm line-clamp-2">by {book.author}</p>
                   </div>
-                  <span className={`shrink-0 px-3 py-1 text-sm rounded-full whitespace-nowrap ${getPriorityColor(book.priority)}`}>
+                  <span className={`shrink-0 px-2 py-1 text-sm rounded-full whitespace-nowrap ${getPriorityColor(book.priority)}`}>
                     {PRIORITIES.find(p => p.value === book.priority)?.label}
                   </span>
                 </div>
