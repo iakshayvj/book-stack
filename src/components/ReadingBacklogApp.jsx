@@ -63,6 +63,10 @@ const ReadingBacklogApp = () => {
     { value: 'better-thinker', label: 'Critical Thinking' },
     { value: 'better-writer', label: 'Writing Skills' },
     { value: 'better-programmer', label: 'Programming Expertise' },
+    { value: 'better-raconteur', label: 'Casual Reading' },
+    { value: 'better-philosopher', label: 'Philosophy' },
+    { value: 'better-history', label: 'History' },
+    { value: 'better-science', label: 'STEM' },
     { value: 'better-technologist', label: 'Tech Knowledge' }
   ];
 
@@ -219,6 +223,8 @@ const getPriorityColor = (priority) => {
           <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
           <img src="/book.png" alt="Book Icon" className="w-8 h-8" />
             Reading Backlog</h1>
+
+
           <div className="flex gap-4">
             <Button 
               onClick={() => setIsAddDialogOpen(true)}
