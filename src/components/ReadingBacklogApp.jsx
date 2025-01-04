@@ -39,7 +39,7 @@ const ReadingBacklogApp = () => {
   const [selectedBook, setSelectedBook] = useState(null);
   const [newComment, setNewComment] = useState('');
 
-  
+
   // Form state
   const [formData, setFormData] = useState({
     id: '',
@@ -50,7 +50,7 @@ const ReadingBacklogApp = () => {
     source: '',
     purpose: '',
     priority: '',
-
+    completionDate: null,
     comments: [],
     createdAt: null,
     updatedAt: null
@@ -74,6 +74,7 @@ const ReadingBacklogApp = () => {
     { value: 'currently-reading', label: 'Currently Reading' },
     { value: 'next', label: 'Next Up' },
     { value: 'later', label: 'Read Later' },
+    { value: 'read', label: 'Read' },
     { value: 'not-decided', label: 'Not Decided' }
   ];
 
@@ -127,6 +128,7 @@ const ReadingBacklogApp = () => {
       source: '',
       purpose: '',
       priority: '',
+      completionDate: null,
       comments: [],
       createdAt: null,
       updatedAt: null
@@ -154,7 +156,7 @@ const ReadingBacklogApp = () => {
       updatedAt: new Date().toISOString()
     };
 
-    setBooks(books.map(book => 
+    setBooks(books.map(book =>
       book.id === selectedBook.id ? updatedBook : book
     ));
     setSelectedBook(updatedBook);
@@ -164,7 +166,7 @@ const ReadingBacklogApp = () => {
   // Export data
   const handleExport = () => {
     const dataStr = JSON.stringify(books, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
     const exportFileDefaultName = 'reading-backlog.json';
 
     const linkElement = document.createElement('a');
@@ -199,34 +201,36 @@ const ReadingBacklogApp = () => {
   };
 
   // Add this helper function at the component level (above return statement)
-const getPriorityColor = (priority) => {
-  switch (priority) {
-    case 'currently-reading':
-      return 'bg-green-100 text-green-800'; // Pastel green
-    case 'next':
-      return 'bg-orange-100 text-orange-800'; // Pastel orange
-    case 'later':
-      return 'bg-blue-100 text-blue-800'; // Pastel blue
-    case 'not-decided':
-      return 'bg-gray-100 text-gray-800'; // Pastel gray
-    default:
-      return 'bg-gray-100 text-gray-800';
-  }
-};
+  const getPriorityColor = (priority) => {
+    switch (priority) {
+      case 'currently-reading':
+        return 'bg-green-100 text-green-800'; // Pastel green
+      case 'next':
+        return 'bg-orange-100 text-orange-800'; // Pastel orange
+      case 'later':
+        return 'bg-blue-100 text-blue-800';
+      case 'read':
+        return 'bg-purple-100 text-purple-800';   // Pastel blue
+      case 'not-decided':
+        return 'bg-gray-100 text-gray-800'; // Pastel gray
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#F6F5F2] bg-subtle-pattern bg-fixed px-8 py-6" style={{ backgroundColor: '#F6F5F2' }}>
-    
+
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-          <img src="/book.png" alt="Book Icon" className="w-8 h-8" />
+            <img src="/book.png" alt="Book Icon" className="w-8 h-8" />
             Reading Backlog</h1>
 
 
           <div className="flex gap-4">
-            <Button 
+            <Button
               onClick={() => setIsAddDialogOpen(true)}
               className="flex items-center gap-2 bg-black text-white hover:bg-gray-800"
             >
@@ -258,7 +262,7 @@ const getPriorityColor = (priority) => {
                 className="hidden"
               />
             </div>
-  
+
             <Button
               variant="destructive"
               onClick={handleClear}
@@ -270,38 +274,83 @@ const getPriorityColor = (priority) => {
           </div>
         </div>
 
-        {/* Book Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {books
-            .sort((a, b) => {
-              const priorityOrder = {
-                'currently-reading': 1,
-                'next': 2,
-                'later': 3,
-                'not-decided': 4
-              };
-              return priorityOrder[a.priority] - priorityOrder[b.priority];
-            })
-            .map(book => (
-                              <div
-                key={book.id}
-                onClick={() => {
-                  setSelectedBook(book);
-                  setIsDetailSheetOpen(true);
-                }}
-                className="bg-white rounded-lg shadow-md p-3 cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-[1.02] hover:bg-gray-50"
-              >
-                <div className="flex justify-between items-start gap-4">
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-lg mb-1 break-words">{book.title}</h3>
-                    <p className="text-gray-600 text-sm line-clamp-2">by {book.author}</p>
+        {/* Active Reading Section */}
+        <div className="space-y-8">
+          <div>
+            <h2 className="text-xl font-semibold mb-4">Currently Reading & Up Next</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {books
+                .filter(book => book.priority !== 'read')
+                .sort((a, b) => {
+                  const priorityOrder = {
+                    'currently-reading': 1,
+                    'next': 2,
+                    'later': 3,
+                    'not-decided': 4
+                  };
+                  return priorityOrder[a.priority] - priorityOrder[b.priority];
+                })
+                .map(book => (
+                  <div
+                    key={book.id}
+                    onClick={() => {
+                      setSelectedBook(book);
+                      setIsDetailSheetOpen(true);
+                    }}
+                    className="bg-white rounded-lg shadow-md p-3 cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-[1.02] hover:bg-gray-50"
+                  >
+                    <div className="flex justify-between items-start gap-4">
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-lg mb-1 break-words">{book.title}</h3>
+                        <p className="text-gray-600 text-sm">by {book.author}</p>
+                      </div>
+                      <span className={`shrink-0 px-2 py-1 text-sm rounded-full whitespace-nowrap ${getPriorityColor(book.priority)}`}>
+                        {PRIORITIES.find(p => p.value === book.priority)?.label}
+                      </span>
+                    </div>
                   </div>
-                  <span className={`shrink-0 px-2 py-1 text-sm rounded-full whitespace-nowrap ${getPriorityColor(book.priority)}`}>
-                    {PRIORITIES.find(p => p.value === book.priority)?.label}
-                  </span>
-                </div>
+                ))}
+            </div>
+          </div>
+
+          {/* Read Books Section */}
+          {books.some(book => book.priority === 'read') && (
+            <div>
+              <h2 className="text-xl font-semibold mb-4">Read Books</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {books
+                  .filter(book => book.priority === 'read')
+                  .sort((a, b) => new Date(b.completionDate) - new Date(a.completionDate))
+                  .map(book => (
+                    <div
+                      key={book.id}
+                      onClick={() => {
+                        setSelectedBook(book);
+                        setIsDetailSheetOpen(true);
+                      }}
+                      className="bg-white rounded-lg shadow-md p-3 cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-[1.02] hover:bg-gray-50"
+                    >
+                      <div className="flex justify-between items-start gap-4">
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-lg mb-1 break-words">{book.title}</h3>
+                          <p className="text-gray-600 text-sm">by {book.author}</p>
+                        </div>
+                        <div className="flex flex-col items-end gap-1">
+                          <span className={`shrink-0 px-2 py-1 text-sm rounded-full whitespace-nowrap ${getPriorityColor(book.priority)}`}>
+                            {PRIORITIES.find(p => p.value === book.priority)?.label}
+                          </span>
+                          {book.completionDate && (
+                            <span className="text-xs text-gray-500">
+                              Completed: {new Date(book.completionDate).toLocaleDateString()}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
               </div>
-            ))}
+            </div>
+          )}
         </div>
 
         {/* Add/Edit Dialog */}
@@ -316,7 +365,7 @@ const getPriorityColor = (priority) => {
                   <label className="text-sm font-medium">Type</label>
                   <Select
                     value={formData.type}
-                    onValueChange={(value) => setFormData({...formData, type: value})}
+                    onValueChange={(value) => setFormData({ ...formData, type: value })}
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -331,7 +380,7 @@ const getPriorityColor = (priority) => {
                   <label className="text-sm font-medium">Priority</label>
                   <Select
                     value={formData.priority}
-                    onValueChange={(value) => setFormData({...formData, priority: value})}
+                    onValueChange={(value) => setFormData({ ...formData, priority: value, completionDate: value === 'read' ? new Date().toISOString().split('T')[0] : null })}
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -345,13 +394,29 @@ const getPriorityColor = (priority) => {
                     </SelectContent>
                   </Select>
                 </div>
+
+                { /* Show completion date field only when priority is 'read' */}
+
+                {formData.priority === 'read' && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Completion Date</label>
+                    <Input
+                      type="date"
+                      value={formData.completionDate || ''}
+                      onChange={(e) => setFormData({ ...formData, completionDate: e.target.value })}
+                      required
+                    />
+                  </div>
+                )}
+
+
               </div>
-              
+
               <div className="space-y-2">
                 <label className="text-sm font-medium">Title</label>
                 <Input
                   value={formData.title}
-                  onChange={(e) => setFormData({...formData, title: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   required
                 />
               </div>
@@ -360,7 +425,7 @@ const getPriorityColor = (priority) => {
                 <label className="text-sm font-medium">Author</label>
                 <Input
                   value={formData.author}
-                  onChange={(e) => setFormData({...formData, author: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, author: e.target.value })}
                   required
                 />
               </div>
@@ -369,7 +434,7 @@ const getPriorityColor = (priority) => {
                 <label className="text-sm font-medium">Genre</label>
                 <Input
                   value={formData.genre}
-                  onChange={(e) => setFormData({...formData, genre: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, genre: e.target.value })}
                 />
               </div>
 
@@ -377,7 +442,7 @@ const getPriorityColor = (priority) => {
                 <label className="text-sm font-medium">Purpose</label>
                 <Select
                   value={formData.purpose}
-                  onValueChange={(value) => setFormData({...formData, purpose: value})}
+                  onValueChange={(value) => setFormData({ ...formData, purpose: value })}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -396,7 +461,7 @@ const getPriorityColor = (priority) => {
                 <label className="text-sm font-medium">Source & Reason</label>
                 <Textarea
                   value={formData.source}
-                  onChange={(e) => setFormData({...formData, source: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, source: e.target.value })}
                   placeholder="Where did you find this book and why did you add it to your backlog?"
                   className="h-24"
                 />
@@ -460,9 +525,18 @@ const getPriorityColor = (priority) => {
                     </div>
                     <div>
                       <h4 className="text-sm font-medium text-gray-500">Priority</h4>
-                      <span className={`inline-block px-3 py-1 text-sm rounded-full mt-1 ${getPriorityColor(selectedBook.priority)}`}>
-    {PRIORITIES.find(p => p.value === selectedBook.priority)?.label}
-  </span>
+
+                      <div className="flex flex-col gap-1">
+                        <span className={`inline-block px-3 py-1 text-sm rounded-full w-fit ${getPriorityColor(selectedBook.priority)}`}>
+                          {PRIORITIES.find(p => p.value === selectedBook.priority)?.label}
+                        </span>
+                        {selectedBook.priority === 'read' && selectedBook.completionDate && (
+                          <p className="text-xs text-gray-500">
+                            Completed: {new Date(selectedBook.completionDate).toLocaleDateString()}
+                          </p>
+                        )}
+                      </div>
+
                     </div>
                     <div>
                       <h4 className="text-sm font-medium text-gray-500">Purpose</h4>
@@ -472,7 +546,7 @@ const getPriorityColor = (priority) => {
                       <h4 className="text-sm font-medium text-gray-500">Source & Reason</h4>
                       <p className="whitespace-pre-wrap">{selectedBook.source || 'Not specified'}</p>
                     </div>
-                    
+
                     {/* Comments section */}
                     <div className="pt-4">
                       <h4 className="text-sm font-medium text-gray-500 mb-4">Comments</h4>
@@ -485,7 +559,7 @@ const getPriorityColor = (priority) => {
                             </p>
                           </div>
                         ))}
-                        
+
                         <div className="flex gap-2">
                           <Textarea
                             value={newComment}
@@ -499,7 +573,7 @@ const getPriorityColor = (priority) => {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="text-xs text-gray-400 pt-4">
                       <p>Added: {new Date(selectedBook.createdAt).toLocaleString()}</p>
                       <p>Last updated: {new Date(selectedBook.updatedAt).toLocaleString()}</p>
