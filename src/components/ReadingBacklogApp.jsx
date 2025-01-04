@@ -575,12 +575,12 @@ const ReadingBacklogApp = () => {
 
         {/* Detail Sheet */}
         <Sheet open={isDetailSheetOpen} onOpenChange={setIsDetailSheetOpen}>
-          <SheetContent className="w-full sm:max-w-xl">
+          <SheetContent className="w-full sm:max-w-xl overflow-y-auto">
             {selectedBook && (
               <>
-                <SheetHeader className="pr-8">
+                <SheetHeader className="pb-4 border-b pr-8">
                   <SheetTitle className="flex justify-between items-center">
-                    <span>{selectedBook.title}</span>
+                    <span className="text-xl font-semibold text-gray-900">{selectedBook.title}</span>
                     <div className="flex gap-2">
                       <Button
                         variant="outline"
@@ -602,76 +602,82 @@ const ReadingBacklogApp = () => {
                       </Button>
                     </div>
                   </SheetTitle>
+                  <p className="text-gray-500 mt-1">by {selectedBook.author}</p>
                 </SheetHeader>
-                <div className="mt-6 space-y-6">
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-500">Author</h4>
-                      <p>{selectedBook.author}</p>
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-500">Type</h4>
-                      <p className="capitalize">{selectedBook.type}</p>
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-500">Genre</h4>
-                      <p>{selectedBook.genre || 'Not specified'}</p>
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-500">Priority</h4>
 
+                <div className="mt-6 space-y-8">
+                  {/* Book Details */}
+                  <div className="grid grid-cols-2 gap-6">
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-500 mb-1">Type</h4>
+                      <p className="capitalize text-gray-900">{selectedBook.type}</p>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-500 mb-1">Genre</h4>
+                      <p className="text-gray-900">{selectedBook.genre || 'Not specified'}</p>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-500 mb-1">Purpose</h4>
+                      <p className="text-gray-900">{PURPOSES.find(p => p.value === selectedBook.purpose)?.label || 'Not specified'}</p>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-500 mb-1">Status</h4>
                       <div className="flex flex-col gap-1">
                         <span className={`inline-block px-3 py-1 text-sm rounded-full w-fit ${getPriorityColor(selectedBook.priority)}`}>
                           {PRIORITIES.find(p => p.value === selectedBook.priority)?.label}
                         </span>
                         {selectedBook.priority === 'read' && selectedBook.completionDate && (
-                          <p className="text-xs text-gray-500">
+                          <p className="text-sm text-gray-500">
                             Completed: {new Date(selectedBook.completionDate).toLocaleDateString()}
                           </p>
                         )}
                       </div>
+                    </div>
+                  </div>
 
+                  {/* Source & Reason */}
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-500 mb-2">Source & Reason</h4>
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <p className="text-gray-900 whitespace-pre-wrap">{selectedBook.source || 'Not specified'}</p>
                     </div>
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-500">Purpose</h4>
-                      <p>{PURPOSES.find(p => p.value === selectedBook.purpose)?.label || 'Not specified'}</p>
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-500">Source & Reason</h4>
-                      <p className="whitespace-pre-wrap">{selectedBook.source || 'Not specified'}</p>
-                    </div>
+                  </div>
 
-                    {/* Comments section */}
-                    <div className="pt-4">
-                      <h4 className="text-sm font-medium text-gray-500 mb-4">Comments</h4>
-                      <div className="space-y-4">
-                        {selectedBook.comments.map(comment => (
+                  {/* Comments section */}
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-500 mb-4">Comments & Notes</h4>
+                    <div className="space-y-4">
+                      {selectedBook.comments.length > 0 ? (
+                        selectedBook.comments.map(comment => (
                           <div key={comment.id} className="bg-gray-50 rounded-lg p-4">
-                            <p className="text-sm text-gray-600">{comment.text}</p>
-                            <p className="text-xs text-gray-400 mt-2">
+                            <p className="text-gray-900 text-sm">{comment.text}</p>
+                            <p className="text-xs text-gray-500 mt-2">
                               {new Date(comment.timestamp).toLocaleString()}
                             </p>
                           </div>
-                        ))}
+                        ))
+                      ) : (
+                        <p className="text-gray-500 text-sm italic">No comments yet</p>
+                      )}
 
-                        <div className="flex gap-2">
-                          <Textarea
-                            value={newComment}
-                            onChange={(e) => setNewComment(e.target.value)}
-                            placeholder="Add a comment..."
-                            className="flex-1"
-                          />
-                          <Button onClick={handleAddComment} className="self-end">
-                            Add
-                          </Button>
-                        </div>
+                      <div className="flex gap-2 pt-2">
+                        <Textarea
+                          value={newComment}
+                          onChange={(e) => setNewComment(e.target.value)}
+                          placeholder="Add a comment..."
+                          className="flex-1"
+                        />
+                        <Button onClick={handleAddComment} className="self-end">
+                          Add
+                        </Button>
                       </div>
                     </div>
+                  </div>
 
-                    <div className="text-xs text-gray-400 pt-4">
-                      <p>Added: {new Date(selectedBook.createdAt).toLocaleString()}</p>
-                      <p>Last updated: {new Date(selectedBook.updatedAt).toLocaleString()}</p>
-                    </div>
+                  {/* Metadata footer */}
+                  <div className="text-xs text-gray-400 pt-4 border-t">
+                    <p>Added: {new Date(selectedBook.createdAt).toLocaleString()}</p>
+                    <p>Last updated: {new Date(selectedBook.updatedAt).toLocaleString()}</p>
                   </div>
                 </div>
               </>
