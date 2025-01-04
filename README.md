@@ -2,6 +2,8 @@
 
 A modern web application to manage your reading list and track your reading progress. Built with React, Vite, and Tailwind CSS.
 
+![bookstack](https://screenshots-adit.s3.ap-south-1.amazonaws.com/bookstack.png)
+
 ## Features
 
 - **Book Management**
