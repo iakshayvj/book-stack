@@ -38,6 +38,8 @@ const ReadingBacklogApp = () => {
   const [isDetailSheetOpen, setIsDetailSheetOpen] = useState(false);
   const [selectedBook, setSelectedBook] = useState(null);
   const [newComment, setNewComment] = useState('');
+  const [filterYear, setFilterYear] = useState('all');
+  const [filterMonth, setFilterMonth] = useState('all');
 
 
   // Form state for adding/editing a book 
@@ -76,6 +78,21 @@ const ReadingBacklogApp = () => {
     { value: 'later', label: 'Read Later' },
     { value: 'read', label: 'Read' },
     { value: 'not-decided', label: 'Not Decided' }
+  ];
+
+  const MONTHS = [
+    { value: '0', label: 'January' },
+    { value: '1', label: 'February' },
+    { value: '2', label: 'March' },
+    { value: '3', label: 'April' },
+    { value: '4', label: 'May' },
+    { value: '5', label: 'June' },
+    { value: '6', label: 'July' },
+    { value: '7', label: 'August' },
+    { value: '8', label: 'September' },
+    { value: '9', label: 'October' },
+    { value: '10', label: 'November' },
+    { value: '11', label: 'December' }
   ];
 
   // Load data from localStorage on mount 
@@ -140,6 +157,14 @@ const ReadingBacklogApp = () => {
   const handleDelete = (id) => {
     setBooks(books.filter(book => book.id !== id));
     setIsDetailSheetOpen(false);
+  };
+
+  // Helper function to get available years
+  const getAvailableYears = (books) => {
+    const years = books
+      .filter(book => book.priority === 'read' && book.completionDate)
+      .map(book => new Date(book.completionDate).getFullYear());
+    return [...new Set(years)].sort((a, b) => b - a); // Sort descending
   };
 
   // Handle adding a comment
@@ -313,13 +338,65 @@ const ReadingBacklogApp = () => {
             </div>
           </div>
 
+          <hr />
           {/* Read Books Section */}
+
           {books.some(book => book.priority === 'read') && (
             <div>
-              <h2 className="text-xl font-semibold mb-4">Read Books</h2>
+              <div className="flex items-center gap-4 mb-4">
+                <h2 className="text-xl font-semibold">Read Books</h2>
+                <div className="flex gap-3">
+                  <Select
+                    value={filterYear}
+                    onValueChange={setFilterYear}
+                  >
+                    <SelectTrigger className="w-[120px]">
+                      <SelectValue placeholder="Select Year" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Years</SelectItem>
+                      {getAvailableYears(books).map(year => (
+                        <SelectItem key={year} value={year.toString()}>
+                          {year}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  {filterYear !== 'all' && (
+                    <Select
+                      value={filterMonth}
+                      onValueChange={setFilterMonth}
+                    >
+                      <SelectTrigger className="w-[130px]">
+                        <SelectValue placeholder="Select Month" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Months</SelectItem>
+                        {MONTHS.map(month => (
+                          <SelectItem key={month.value} value={month.value}>
+                            {month.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {books
                   .filter(book => book.priority === 'read')
+                  .filter(book => {
+                    if (!book.completionDate) return false;
+                    const completionDate = new Date(book.completionDate);
+
+                    if (filterYear === 'all') return true;
+                    if (completionDate.getFullYear().toString() !== filterYear) return false;
+
+                    if (filterMonth === 'all') return true;
+                    return completionDate.getMonth().toString() === filterMonth;
+                  })
                   .sort((a, b) => new Date(b.completionDate) - new Date(a.completionDate))
                   .map(book => (
                     <div
@@ -349,8 +426,25 @@ const ReadingBacklogApp = () => {
                     </div>
                   ))}
               </div>
+
+              {books.filter(book => book.priority === 'read').length > 0 &&
+                books.filter(book => {
+                  if (!book.completionDate) return false;
+                  const completionDate = new Date(book.completionDate);
+
+                  if (filterYear === 'all') return true;
+                  if (completionDate.getFullYear().toString() !== filterYear) return false;
+
+                  if (filterMonth === 'all') return true;
+                  return completionDate.getMonth().toString() === filterMonth;
+                }).length === 0 && (
+                  <p className="text-center text-gray-500 mt-8">
+                    No books found for the selected time period
+                  </p>
+                )}
             </div>
           )}
+
         </div>
 
         {/* Add/Edit Dialog */}
