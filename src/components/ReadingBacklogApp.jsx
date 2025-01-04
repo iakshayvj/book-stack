@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/select";
 
 const ReadingBacklogApp = () => {
-  // State management
+  // State management 
   const [books, setBooks] = useState(() => {
     try {
       const savedBooks = localStorage.getItem('readingBacklog');
@@ -40,7 +40,7 @@ const ReadingBacklogApp = () => {
   const [newComment, setNewComment] = useState('');
 
 
-  // Form state
+  // Form state for adding/editing a book 
   const [formData, setFormData] = useState({
     id: '',
     title: '',
@@ -56,7 +56,7 @@ const ReadingBacklogApp = () => {
     updatedAt: null
   });
 
-  // Constants
+  // Constants for select options
   const PURPOSES = [
     { value: 'better-designer', label: 'Grow as a Designer' },
     { value: 'better-human', label: 'Personal Growth' },
@@ -78,7 +78,7 @@ const ReadingBacklogApp = () => {
     { value: 'not-decided', label: 'Not Decided' }
   ];
 
-  // Load data from localStorage on mount
+  // Load data from localStorage on mount 
   useEffect(() => {
     try {
       const savedBooks = localStorage.getItem('readingBacklog');
@@ -102,7 +102,7 @@ const ReadingBacklogApp = () => {
     }
   }, [books]);
 
-  // Handle form submission
+  // Handle form submission 
   const handleSubmit = (e) => {
     e.preventDefault();
     const timestamp = new Date().toISOString();
@@ -484,7 +484,7 @@ const ReadingBacklogApp = () => {
           <SheetContent className="w-full sm:max-w-xl">
             {selectedBook && (
               <>
-                <SheetHeader>
+                <SheetHeader className="pr-8">
                   <SheetTitle className="flex justify-between items-center">
                     <span>{selectedBook.title}</span>
                     <div className="flex gap-2">
