@@ -7,7 +7,6 @@
  * Description:
  * A personal reading log application built with minimalism in mind.
  * Uses localStorage for data persistence and focuses on simplicity.
- * Built in collaboration with Claude (Anthropic).
  * 
  * License: MIT
  * Last Updated: January 2024
