@@ -1,3 +1,19 @@
+/**
+ * BookStack - A minimalist reading tracker
+ * Version: 1.0.0
+ * Author: Adit Gupta
+ * Built with: React, Vite, TailwindCSS, shadcn/ui
+ * 
+ * Description:
+ * A personal reading log application built with minimalism in mind.
+ * Uses localStorage for data persistence and focuses on simplicity.
+ * Built in collaboration with Claude (Anthropic).
+ * 
+ * License: MIT
+ * Last Updated: January 2024
+ */
+
+// All imports required for the ReadingBacklogApp component
 import React, { useState, useEffect } from 'react';
 import { Plus, X, Edit2, Trash2, Download, Upload, ExternalLink } from 'lucide-react';
 import {
@@ -34,13 +50,15 @@ const ReadingBacklogApp = () => {
       return [];
     }
   });
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [isDetailSheetOpen, setIsDetailSheetOpen] = useState(false);
-  const [selectedBook, setSelectedBook] = useState(null);
-  const [newComment, setNewComment] = useState('');
+
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false); // For adding/editing a book
+  const [isDetailSheetOpen, setIsDetailSheetOpen] = useState(false);  // For showing book details
+  const [selectedBook, setSelectedBook] = useState(null); // For showing book details
+  const [newComment, setNewComment] = useState(''); // For adding comments
   const [filterYear, setFilterYear] = useState('all');
-  const [filterMonth, setFilterMonth] = useState('all');
-  const [latestCommentId, setLatestCommentId] = useState(null);
+  const [filterMonth, setFilterMonth] = useState('all'); // For filtering read books
+  const [latestCommentId, setLatestCommentId] = useState(null); // For highlighting the latest comment
+
   // Form state for adding/editing a book 
   const [formData, setFormData] = useState({
     id: '',
@@ -135,6 +153,7 @@ const ReadingBacklogApp = () => {
       setBooks([...books, newBook]);
     }
 
+    // Reset form data and close the dialog
     setFormData({
       id: '',
       title: '',
@@ -166,30 +185,10 @@ const ReadingBacklogApp = () => {
     return [...new Set(years)].sort((a, b) => b - a); // Sort descending
   };
 
-  // Handle adding a comment
-  // const handleAddComment = () => {
-  //   if (!newComment.trim()) return;
-
-  //   const updatedBook = {
-  //     ...selectedBook,
-  //     comments: [...selectedBook.comments, {
-  //       id: crypto.randomUUID(),
-  //       text: newComment,
-  //       timestamp: new Date().toISOString()
-  //     }],
-  //     updatedAt: new Date().toISOString()
-  //   };
-
-  //   setBooks(books.map(book =>
-  //     book.id === selectedBook.id ? updatedBook : book
-  //   ));
-  //   setSelectedBook(updatedBook);
-  //   setNewComment('');
-  // };
-
+  // Helper function to add a comment
   const handleAddComment = () => {
     if (!newComment.trim()) return;
-  
+
     const commentId = crypto.randomUUID();
     const updatedBook = {
       ...selectedBook,
@@ -200,14 +199,14 @@ const ReadingBacklogApp = () => {
       }],
       updatedAt: new Date().toISOString()
     };
-  
-    setBooks(books.map(book => 
+
+    setBooks(books.map(book =>
       book.id === selectedBook.id ? updatedBook : book
     ));
     setSelectedBook(updatedBook);
     setNewComment('');
     setLatestCommentId(commentId);
-    
+
     // Reset the latest comment ID after animation
     setTimeout(() => {
       setLatestCommentId(null);
@@ -251,7 +250,7 @@ const ReadingBacklogApp = () => {
     }
   };
 
-  // Add this helper function at the component level (above return statement)
+  // Helper function to get priority color
   const getPriorityColor = (priority) => {
     switch (priority) {
       case 'currently-reading':
@@ -339,7 +338,7 @@ const ReadingBacklogApp = () => {
                     'later': 3,
                     'not-decided': 4
                   };
-                  return priorityOrder[a.priority] - priorityOrder[b.priority];
+                  return priorityOrder[a.priority] - priorityOrder[b.priority]; // Sort by priority
                 })
                 .map(book => (
                   <div
@@ -366,8 +365,8 @@ const ReadingBacklogApp = () => {
           </div>
 
           <hr />
-          {/* Read Books Section */}
 
+          {/* Read Books Section */}
           {books.some(book => book.priority === 'read') && (
             <div>
               <div className="flex items-center gap-4 mb-4">
@@ -454,6 +453,7 @@ const ReadingBacklogApp = () => {
                   ))}
               </div>
 
+              {/* No books found message */}
               {books.filter(book => book.priority === 'read').length > 0 &&
                 books.filter(book => {
                   if (!book.completionDate) return false;
@@ -694,11 +694,10 @@ const ReadingBacklogApp = () => {
                           [...selectedBook.comments]
                             .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
                             .map(comment => (
-                              <div key={comment.id} className={`bg-gray-50 rounded-lg p-4 ${
-                                comment.id === latestCommentId
-                                ? 'animate-[highlightComment_2s_ease-out]'
-                                : ''
-                              }`}>
+                              <div key={comment.id} className={`bg-gray-50 rounded-lg p-4 ${comment.id === latestCommentId
+                                  ? 'animate-[highlightComment_2s_ease-out]'
+                                  : ''
+                                }`}>
                                 <p className="font-body text-sm text-gray-900">{comment.text}</p>
                                 <p className="font-body text-xs text-gray-500 mt-2">
                                   {new Date(comment.timestamp).toLocaleString()}
