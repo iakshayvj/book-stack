@@ -41,7 +41,6 @@ const ReadingBacklogApp = () => {
   const [filterYear, setFilterYear] = useState('all');
   const [filterMonth, setFilterMonth] = useState('all');
 
-
   // Form state for adding/editing a book 
   const [formData, setFormData] = useState({
     id: '',
@@ -73,9 +72,9 @@ const ReadingBacklogApp = () => {
   ];
 
   const PRIORITIES = [
-    { value: 'currently-reading', label: 'Currently Reading' },
+    { value: 'currently-reading', label: 'Reading' },
     { value: 'next', label: 'Next Up' },
-    { value: 'later', label: 'Read Later' },
+    { value: 'later', label: 'Later' },
     { value: 'read', label: 'Read' },
     { value: 'not-decided', label: 'Not Decided' }
   ];
@@ -249,7 +248,7 @@ const ReadingBacklogApp = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+          <h1 className="font-display text-3xl font-bold text-gray-900 flex items-center gap-3">
             <img src="/book.png" alt="Book Icon" className="w-8 h-8" />
             Reading Backlog</h1>
 
@@ -302,7 +301,7 @@ const ReadingBacklogApp = () => {
         {/* Active Reading Section */}
         <div className="space-y-8">
           <div>
-            <h2 className="text-xl font-semibold mb-4">Currently Reading & Up Next</h2>
+            <h2 className="font-display text-xl font-semibold mb-4">Currently Reading & Up Next</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {books
                 .filter(book => book.priority !== 'read')
@@ -325,9 +324,10 @@ const ReadingBacklogApp = () => {
                     className="bg-white rounded-lg shadow-md p-3 cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-[1.02] hover:bg-gray-50"
                   >
                     <div className="flex justify-between items-start gap-4">
+
                       <div className="flex-1">
-                        <h3 className="font-semibold text-lg mb-1 break-words">{book.title}</h3>
-                        <p className="text-gray-600 text-sm">by {book.author}</p>
+                        <h3 className="font-body font-semibold text-lg mb-1 break-words">{book.title}</h3>
+                        <p className="font-body text-gray-600 text-sm">by {book.author}</p>
                       </div>
                       <span className={`shrink-0 px-2 py-1 text-sm rounded-full whitespace-nowrap ${getPriorityColor(book.priority)}`}>
                         {PRIORITIES.find(p => p.value === book.priority)?.label}
@@ -344,7 +344,7 @@ const ReadingBacklogApp = () => {
           {books.some(book => book.priority === 'read') && (
             <div>
               <div className="flex items-center gap-4 mb-4">
-                <h2 className="text-xl font-semibold">Read Books</h2>
+                <h2 className="font-display text-xl font-semibold">Read Books</h2>
                 <div className="flex gap-3">
                   <Select
                     value={filterYear}
@@ -409,8 +409,8 @@ const ReadingBacklogApp = () => {
                     >
                       <div className="flex justify-between items-start gap-4">
                         <div className="flex-1">
-                          <h3 className="font-semibold text-lg mb-1 break-words">{book.title}</h3>
-                          <p className="text-gray-600 text-sm">by {book.author}</p>
+                          <h3 className="font-body font-semibold text-lg mb-1 break-words">{book.title}</h3>
+                          <p className="font-body text-gray-600 text-sm">by {book.author}</p>
                         </div>
                         <div className="flex flex-col items-end gap-1">
                           <span className={`shrink-0 px-2 py-1 text-sm rounded-full whitespace-nowrap ${getPriorityColor(book.priority)}`}>
@@ -515,6 +515,16 @@ const ReadingBacklogApp = () => {
                 />
               </div>
 
+
+
+              {/* Hidden input for actual form submission */}
+              <Input
+                type="hidden"
+                value={formData.title}
+                name="title"
+                required
+              />
+
               <div className="space-y-2">
                 <label className="text-sm font-medium">Author</label>
                 <Input
@@ -580,7 +590,7 @@ const ReadingBacklogApp = () => {
               <>
                 <SheetHeader className="pb-4 border-b pr-8">
                   <SheetTitle className="flex justify-between items-center">
-                    <span className="text-xl font-semibold text-gray-900">{selectedBook.title}</span>
+                    <span className="font-body text-xl font-semibold text-gray-900">{selectedBook.title}</span>
                     <div className="flex gap-2">
                       <Button
                         variant="outline"
@@ -602,7 +612,7 @@ const ReadingBacklogApp = () => {
                       </Button>
                     </div>
                   </SheetTitle>
-                  <p className="text-gray-500 mt-1">by {selectedBook.author}</p>
+                  <p className="font-body text-gray-500 mt-1">by {selectedBook.author}</p>
                 </SheetHeader>
 
                 <div className="mt-6 space-y-8">
@@ -610,15 +620,15 @@ const ReadingBacklogApp = () => {
                   <div className="grid grid-cols-2 gap-6">
                     <div>
                       <h4 className="text-sm font-medium text-gray-500 mb-1">Type</h4>
-                      <p className="capitalize text-gray-900">{selectedBook.type}</p>
+                      <p className="font-body capitalize text-gray-900">{selectedBook.type}</p>
                     </div>
                     <div>
                       <h4 className="text-sm font-medium text-gray-500 mb-1">Genre</h4>
-                      <p className="text-gray-900">{selectedBook.genre || 'Not specified'}</p>
+                      <p className="font-body text-gray-900">{selectedBook.genre || 'Not specified'}</p>
                     </div>
                     <div>
                       <h4 className="text-sm font-medium text-gray-500 mb-1">Purpose</h4>
-                      <p className="text-gray-900">{PURPOSES.find(p => p.value === selectedBook.purpose)?.label || 'Not specified'}</p>
+                      <p className="font-body text-gray-900">{PURPOSES.find(p => p.value === selectedBook.purpose)?.label || 'Not specified'}</p>
                     </div>
                     <div>
                       <h4 className="text-sm font-medium text-gray-500 mb-1">Status</h4>
@@ -650,7 +660,7 @@ const ReadingBacklogApp = () => {
                       {selectedBook.comments.length > 0 ? (
                         selectedBook.comments.map(comment => (
                           <div key={comment.id} className="bg-gray-50 rounded-lg p-4">
-                            <p className="text-gray-900 text-sm">{comment.text}</p>
+                            <p className="font-body text-gray-900 text-sm">{comment.text}</p>
                             <p className="text-xs text-gray-500 mt-2">
                               {new Date(comment.timestamp).toLocaleString()}
                             </p>

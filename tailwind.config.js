@@ -32,6 +32,10 @@ module.exports = {
         "accordion-up": "accordion-up 0.2s ease-out",
       },
     },
+    fontFamily: {
+        display: ['Lexend', 'sans-serif'],
+        body: ['Inter', 'sans-serif'],
+    },
   },
   plugins: [require("tailwindcss-animate")],
 }
