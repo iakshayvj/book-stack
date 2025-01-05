@@ -328,7 +328,7 @@ const ReadingBacklogApp = () => {
         {/* Active Reading Section */}
         <div className="space-y-8">
           <div>
-            <h2 className="font-display text-xl font-semibold mb-4">Currently Reading & Up Next</h2>
+            <h2 className="font-display text-xl font-semibold mb-4 text-gray-700">Currently Reading & Up Next</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {books
                 .filter(book => book.priority !== 'read')
@@ -353,7 +353,7 @@ const ReadingBacklogApp = () => {
                     <div className="flex justify-between items-start gap-4">
 
                       <div className="flex-1">
-                        <h3 className="font-body font-semibold text-lg mb-1 break-words">{book.title}</h3>
+                        <h3 className="font-body font-semibold text-base mb-1 break-words">{book.title}</h3>
                         <p className="font-body text-gray-600 text-sm">by {book.author}</p>
                       </div>
                       <span className={`shrink-0 px-2 py-1 text-sm rounded-full whitespace-nowrap ${getPriorityColor(book.priority)}`}>
@@ -371,7 +371,7 @@ const ReadingBacklogApp = () => {
           {books.some(book => book.priority === 'read') && (
             <div>
               <div className="flex items-center gap-4 mb-4">
-                <h2 className="font-display text-xl font-semibold">Read Books</h2>
+                <h2 className="font-display text-xl font-semibold text-gray-700">Read Books</h2>
                 <div className="flex gap-3">
                   <Select
                     value={filterYear}
@@ -436,7 +436,7 @@ const ReadingBacklogApp = () => {
                     >
                       <div className="flex justify-between items-start gap-4">
                         <div className="flex-1">
-                          <h3 className="font-body font-semibold text-lg mb-1 break-words">{book.title}</h3>
+                          <h3 className="font-body font-semibold text-base mb-1 break-words">{book.title}</h3>
                           <p className="font-body text-gray-600 text-sm">by {book.author}</p>
                         </div>
                         <div className="flex flex-col items-end gap-1">
