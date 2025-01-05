@@ -40,7 +40,7 @@ const ReadingBacklogApp = () => {
   const [newComment, setNewComment] = useState('');
   const [filterYear, setFilterYear] = useState('all');
   const [filterMonth, setFilterMonth] = useState('all');
-
+  const [latestCommentId, setLatestCommentId] = useState(null);
   // Form state for adding/editing a book 
   const [formData, setFormData] = useState({
     id: '',
@@ -167,24 +167,51 @@ const ReadingBacklogApp = () => {
   };
 
   // Handle adding a comment
+  // const handleAddComment = () => {
+  //   if (!newComment.trim()) return;
+
+  //   const updatedBook = {
+  //     ...selectedBook,
+  //     comments: [...selectedBook.comments, {
+  //       id: crypto.randomUUID(),
+  //       text: newComment,
+  //       timestamp: new Date().toISOString()
+  //     }],
+  //     updatedAt: new Date().toISOString()
+  //   };
+
+  //   setBooks(books.map(book =>
+  //     book.id === selectedBook.id ? updatedBook : book
+  //   ));
+  //   setSelectedBook(updatedBook);
+  //   setNewComment('');
+  // };
+
   const handleAddComment = () => {
     if (!newComment.trim()) return;
-
+  
+    const commentId = crypto.randomUUID();
     const updatedBook = {
       ...selectedBook,
       comments: [...selectedBook.comments, {
-        id: crypto.randomUUID(),
+        id: commentId,
         text: newComment,
         timestamp: new Date().toISOString()
       }],
       updatedAt: new Date().toISOString()
     };
-
-    setBooks(books.map(book =>
+  
+    setBooks(books.map(book => 
       book.id === selectedBook.id ? updatedBook : book
     ));
     setSelectedBook(updatedBook);
     setNewComment('');
+    setLatestCommentId(commentId);
+    
+    // Reset the latest comment ID after animation
+    setTimeout(() => {
+      setLatestCommentId(null);
+    }, 2000);
   };
 
   // Export data
@@ -585,109 +612,125 @@ const ReadingBacklogApp = () => {
 
         {/* Detail Sheet */}
         <Sheet open={isDetailSheetOpen} onOpenChange={setIsDetailSheetOpen}>
-          <SheetContent className="w-full sm:max-w-xl overflow-y-auto">
+          <SheetContent className="w-full sm:max-w-xl h-full flex flex-col gap-4 p-0">
             {selectedBook && (
               <>
-                <SheetHeader className="pb-4 border-b pr-8">
-                  <SheetTitle className="flex justify-between items-center">
-                    <span className="font-body text-xl font-semibold text-gray-900">{selectedBook.title}</span>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => {
-                          setFormData(selectedBook);
-                          setIsDetailSheetOpen(false);
-                          setIsAddDialogOpen(true);
-                        }}
-                      >
-                        <Edit2 className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="icon"
-                        onClick={() => handleDelete(selectedBook.id)}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </SheetTitle>
-                  <p className="font-body text-gray-500 mt-1">by {selectedBook.author}</p>
-                </SheetHeader>
+                {/* Scrollable Content */}
+                <div className="flex-1 overflow-y-auto px-6">
+                  <SheetHeader className="pb-4 border-b sticky top-0 bg-white pt-6 pr-8">
+                    <SheetTitle className="flex justify-between items-center">
+                      <span className="font-display text-xl font-semibold text-gray-900">{selectedBook.title}</span>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => {
+                            setFormData(selectedBook);
+                            setIsDetailSheetOpen(false);
+                            setIsAddDialogOpen(true);
+                          }}
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="icon"
+                          onClick={() => handleDelete(selectedBook.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </SheetTitle>
+                    <p className="font-body text-gray-500 mt-1">by {selectedBook.author}</p>
+                  </SheetHeader>
 
-                <div className="mt-6 space-y-8">
-                  {/* Book Details */}
-                  <div className="grid grid-cols-2 gap-6">
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-500 mb-1">Type</h4>
-                      <p className="font-body capitalize text-gray-900">{selectedBook.type}</p>
+                  <div className="py-6 space-y-8">
+                    {/* Book Details Section */}
+                    <div className="grid grid-cols-2 gap-6">
+                      <div>
+                        <h4 className="font-display text-sm font-medium text-gray-500 mb-1">Type</h4>
+                        <p className="font-body capitalize text-gray-900">{selectedBook.type}</p>
+                      </div>
+                      <div>
+                        <h4 className="font-display text-sm font-medium text-gray-500 mb-1">Genre</h4>
+                        <p className="font-body text-gray-900">{selectedBook.genre || 'Not specified'}</p>
+                      </div>
+                      <div>
+                        <h4 className="font-display text-sm font-medium text-gray-500 mb-1">Purpose</h4>
+                        <p className="font-body text-gray-900">
+                          {PURPOSES.find(p => p.value === selectedBook.purpose)?.label || 'Not specified'}
+                        </p>
+                      </div>
+                      <div>
+                        <h4 className="font-display text-sm font-medium text-gray-500 mb-1">Status</h4>
+                        <div className="flex flex-col gap-1">
+                          <span className={`font-body inline-block px-3 py-1 text-sm rounded-full w-fit ${getPriorityColor(selectedBook.priority)}`}>
+                            {PRIORITIES.find(p => p.value === selectedBook.priority)?.label}
+                          </span>
+                          {selectedBook.priority === 'read' && selectedBook.completionDate && (
+                            <p className="font-body text-sm text-gray-500">
+                              Completed: {new Date(selectedBook.completionDate).toLocaleDateString()}
+                            </p>
+                          )}
+                        </div>
+                      </div>
                     </div>
+
+                    {/* Source Section */}
                     <div>
-                      <h4 className="text-sm font-medium text-gray-500 mb-1">Genre</h4>
-                      <p className="font-body text-gray-900">{selectedBook.genre || 'Not specified'}</p>
+                      <h4 className="font-display text-sm font-medium text-gray-500 mb-2">Source & Reason</h4>
+                      <div className="bg-gray-50 rounded-lg p-4">
+                        <p className="font-body text-gray-900 whitespace-pre-wrap">
+                          {selectedBook.source || 'Not specified'}
+                        </p>
+                      </div>
                     </div>
+
+                    {/* Comments Section */}
                     <div>
-                      <h4 className="text-sm font-medium text-gray-500 mb-1">Purpose</h4>
-                      <p className="font-body text-gray-900">{PURPOSES.find(p => p.value === selectedBook.purpose)?.label || 'Not specified'}</p>
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-500 mb-1">Status</h4>
-                      <div className="flex flex-col gap-1">
-                        <span className={`inline-block px-3 py-1 text-sm rounded-full w-fit ${getPriorityColor(selectedBook.priority)}`}>
-                          {PRIORITIES.find(p => p.value === selectedBook.priority)?.label}
-                        </span>
-                        {selectedBook.priority === 'read' && selectedBook.completionDate && (
-                          <p className="text-sm text-gray-500">
-                            Completed: {new Date(selectedBook.completionDate).toLocaleDateString()}
-                          </p>
+                      <h4 className="font-display text-sm font-medium text-gray-500 mb-4">Comments & Notes</h4>
+                      <div className="space-y-4">
+                        {selectedBook.comments.length > 0 ? (
+                          [...selectedBook.comments]
+                            .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+                            .map(comment => (
+                              <div key={comment.id} className={`bg-gray-50 rounded-lg p-4 ${
+                                comment.id === latestCommentId
+                                ? 'animate-[highlightComment_2s_ease-out]'
+                                : ''
+                              }`}>
+                                <p className="font-body text-sm text-gray-900">{comment.text}</p>
+                                <p className="font-body text-xs text-gray-500 mt-2">
+                                  {new Date(comment.timestamp).toLocaleString()}
+                                </p>
+                              </div>
+                            ))
+                        ) : (
+                          <p className="font-body text-sm text-gray-500 italic">No comments yet</p>
                         )}
                       </div>
                     </div>
-                  </div>
 
-                  {/* Source & Reason */}
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-500 mb-2">Source & Reason</h4>
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <p className="text-gray-900 whitespace-pre-wrap">{selectedBook.source || 'Not specified'}</p>
+                    {/* Metadata */}
+                    <div className="text-xs text-gray-400 pt-4 border-t font-body">
+                      <p>Added: {new Date(selectedBook.createdAt).toLocaleString()}</p>
+                      <p>Last updated: {new Date(selectedBook.updatedAt).toLocaleString()}</p>
                     </div>
                   </div>
+                </div>
 
-                  {/* Comments section */}
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-500 mb-4">Comments & Notes</h4>
-                    <div className="space-y-4">
-                      {selectedBook.comments.length > 0 ? (
-                        selectedBook.comments.map(comment => (
-                          <div key={comment.id} className="bg-gray-50 rounded-lg p-4">
-                            <p className="font-body text-gray-900 text-sm">{comment.text}</p>
-                            <p className="text-xs text-gray-500 mt-2">
-                              {new Date(comment.timestamp).toLocaleString()}
-                            </p>
-                          </div>
-                        ))
-                      ) : (
-                        <p className="text-gray-500 text-sm italic">No comments yet</p>
-                      )}
-
-                      <div className="flex gap-2 pt-2">
-                        <Textarea
-                          value={newComment}
-                          onChange={(e) => setNewComment(e.target.value)}
-                          placeholder="Add a comment..."
-                          className="flex-1"
-                        />
-                        <Button onClick={handleAddComment} className="self-end">
-                          Add
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Metadata footer */}
-                  <div className="text-xs text-gray-400 pt-4 border-t">
-                    <p>Added: {new Date(selectedBook.createdAt).toLocaleString()}</p>
-                    <p>Last updated: {new Date(selectedBook.updatedAt).toLocaleString()}</p>
+                {/* Fixed Comment Input at Bottom */}
+                <div className="border-t px-6 py-4 bg-white mt-auto">
+                  <div className="flex gap-2">
+                    <Textarea
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                      placeholder="Add a comment..."
+                      className="flex-1"
+                    />
+                    <Button onClick={handleAddComment} className="self-end">
+                      Add
+                    </Button>
                   </div>
                 </div>
               </>

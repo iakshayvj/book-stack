@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
  
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -35,3 +36,13 @@
     --radius: 0.5rem;
   }
 }
+
+@keyframes highlightComment {
+  0% {
+    background-color: rgb(236, 253, 245); /* Light green background */
+  }
+  100% {
+    background-color: rgb(249, 250, 251); /* Back to normal bg-gray-50 */
+  }
+}
+
